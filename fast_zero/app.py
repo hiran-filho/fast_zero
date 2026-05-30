@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from fastapi import FastAPI, HTTPException
 
-from fast_zero.schemas import (  # type: ignore
+from fast_zero.schemas import (
     Message,
     UserDB,
     UserList,
@@ -16,7 +16,7 @@ app = FastAPI(
     version='0.0.1',
 )
 
-database = []
+database: list[UserDB] = []
 
 
 @app.get(
@@ -45,6 +45,14 @@ def read_root():
 #     </html>"""
 
 
+def not_found_user(user_id: int):
+    if user_id > len(database) or user_id < 1:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail=f'Usuário com id {user_id} não encontrado.',
+        )
+
+
 # - - POST - -
 @app.post('/users', status_code=HTTPStatus.CREATED, response_model=UserPublic)
 def create_user(user: UserSchema):
@@ -65,11 +73,7 @@ def read_users():
 )
 def update_user(user_id: int, user: UserSchema):
     user_with_id = UserDB(**user.model_dump(), id=user_id)
-    if user_id > len(database) or user_id < 1:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND,
-            detail=f'Usuário com id {user_id} não encontrado.',
-        )
+    not_found_user(user_id)
     database[user_id - 1] = user_with_id
     return user_with_id
 
@@ -78,10 +82,14 @@ def update_user(user_id: int, user: UserSchema):
     '/users/{user_id}', status_code=HTTPStatus.OK, response_model=UserPublic
 )
 def delete_user(user_id: int):
-    if user_id > len(database) or user_id < 1:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND,
-            detail=f'Usuário com id {user_id} não encontrado.',
-        )
-
+    not_found_user(user_id)
     return database.pop(user_id - 1)
+
+
+# Exercio Aula 03 - GET /users/{user_id}
+@app.get(
+    '/users/{user_id}', status_code=HTTPStatus.OK, response_model=UserPublic
+)
+def read_user(user_id: int):
+    not_found_user(user_id)
+    return database[user_id - 1]
