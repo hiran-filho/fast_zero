@@ -1,5 +1,9 @@
 ## Python
 
+# project stuff
+*.db
+.vscode/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -204,6 +208,4 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Generated using ignr.py - github.com/Antrikshy/ignr.py
-.vscode
 
