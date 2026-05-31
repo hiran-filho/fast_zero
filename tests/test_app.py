@@ -32,6 +32,36 @@ def test_create_user(client):
     }
 
 
+def test_create_user_exist_username(client, user):
+
+    response = client.post(
+        '/users',
+        json={
+            'username': 'Teste',
+            'email': 'alice@example.com',
+            'password': 'securepassword',
+        },
+    )
+
+    assert response.status_code == HTTPStatus.CONFLICT
+    assert response.json() == {'detail': 'Username already exists.'}
+
+
+def test_create_user_exist_email(client, user):
+
+    response = client.post(
+        '/users',
+        json={
+            'username': 'alice',
+            'email': 'teste@test.com',
+            'password': 'securepassword',
+        },
+    )
+
+    assert response.status_code == HTTPStatus.CONFLICT
+    assert response.json() == {'detail': 'Email already exists.'}
+
+
 def test_read_users(client):
     response = client.get('/users/')
 
