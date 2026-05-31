@@ -15,10 +15,10 @@ from fast_zero.models import User, table_registry
 @pytest.fixture
 def client(session):
     def get_session_override():
-        return session
+        yield session
 
+    app.dependency_overrides[get_session] = get_session_override
     with TestClient(app) as client:
-        app.dependency_overrides[get_session] = get_session_override
         yield client
 
     app.dependency_overrides.clear()
@@ -30,7 +30,6 @@ def session():
         'sqlite:///:memory:',
         connect_args={'check_same_thread': False},
         poolclass=StaticPool,
-        echo=True,
     )
 
     table_registry.metadata.create_all(engine)
@@ -39,6 +38,8 @@ def session():
         yield session
 
     table_registry.metadata.drop_all(engine)
+    # Helpful to ensure all connections are closed and resources are released
+    engine.dispose() 
 
 
 @contextmanager
