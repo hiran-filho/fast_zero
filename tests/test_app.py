@@ -37,7 +37,7 @@ def test_create_user_exist_username(client, user):
     response = client.post(
         '/users',
         json={
-            'username': 'Teste',
+            'username': user.username,
             'email': 'alice@example.com',
             'password': 'securepassword',
         },
@@ -53,7 +53,7 @@ def test_create_user_exist_email(client, user):
         '/users',
         json={
             'username': 'alice',
-            'email': 'teste@test.com',
+            'email': user.email,
             'password': 'securepassword',
         },
     )

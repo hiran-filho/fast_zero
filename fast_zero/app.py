@@ -12,6 +12,7 @@ from fast_zero.schemas import (
     UserList,
     UserPublic,
     UserSchema,
+    UserUpdate,
 )
 
 app = FastAPI(
@@ -84,7 +85,7 @@ def read_users(
 
 
 @app.put(
-    '/users/{user_id}', status_code=HTTPStatus.OK, response_model=UserPublic
+    '/users/{user_id}', status_code=HTTPStatus.OK, response_model=UserUpdate
 )
 def update_user(
     user_id: int, user: UserSchema, session: Session = Depends(get_session)

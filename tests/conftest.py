@@ -13,18 +13,6 @@ from fast_zero.models import User, table_registry
 
 
 @pytest.fixture
-def client(session):
-    def get_session_override():
-        yield session
-
-    app.dependency_overrides[get_session] = get_session_override
-    with TestClient(app) as client:
-        yield client
-
-    app.dependency_overrides.clear()
-
-
-@pytest.fixture
 def session():
     engine = create_engine(
         'sqlite:///:memory:',
@@ -39,7 +27,19 @@ def session():
 
     table_registry.metadata.drop_all(engine)
     # Helpful to ensure all connections are closed and resources are released
-    engine.dispose() 
+    engine.dispose()
+
+
+@pytest.fixture
+def client(session):
+    def get_session_override():
+        yield session
+
+    app.dependency_overrides[get_session] = get_session_override
+    with TestClient(app) as client:
+        yield client
+
+    app.dependency_overrides.clear()
 
 
 @contextmanager
@@ -47,6 +47,8 @@ def _mock_db_time(*, model, time=datetime(2025, 5, 20)):
     def fake_time_hook(mapper, connection, target):
         if hasattr(target, 'created_at'):
             target.created_at = time
+        if hasattr(target, 'updated_at'):
+            target.updated_at = time
 
     event.listen(model, 'before_insert', fake_time_hook)
     yield time

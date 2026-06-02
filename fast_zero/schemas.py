@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict, EmailStr
 
 
@@ -17,6 +19,9 @@ class UserPublic(BaseModel):  # type: ignore
     id: int
 
     model_config = ConfigDict(from_attributes=True)
+
+class UserUpdate(UserPublic):
+    updated_at: datetime
 
 
 class UserList(BaseModel):
