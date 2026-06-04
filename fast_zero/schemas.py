@@ -20,9 +20,17 @@ class UserPublic(BaseModel):  # type: ignore
 
     model_config = ConfigDict(from_attributes=True)
 
+
 class UserUpdate(UserPublic):
     updated_at: datetime
 
 
 class UserList(BaseModel):
     users: list[UserPublic]
+
+
+class Token(BaseModel):
+    # O token JWT
+    access_token: str
+    # O modelo que o cliente deve usar
+    token_type: str
